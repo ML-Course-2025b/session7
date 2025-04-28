@@ -1,8 +1,8 @@
 # Session 3: Supervised Learning
 
 > [!IMPORTANT]  
-> [Homework for this week](./material/homework.md)
-
+> - [Homework for this week](./material/homework.md)
+> - Grades for week 6, by the evening
 ---
 
 ### Topics
