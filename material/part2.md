@@ -105,26 +105,37 @@ Transformers look at words simultaneously, losing the original order. **Position
 ```python
 import numpy as np
 
-# Use the embeddings from the previous step (convert back to numpy for easy math)
+# Example embeddings: You can replace this with your actual initial embeddings
+# For the demo, we're assuming there are 5 tokens, each with a 4-dimensional embedding
+initial_embeddings = np.random.randn(5, 4)  # 5 tokens, each with a 4-dimensional embedding
+
+# Convert the initial embeddings to a numpy array for easy manipulation
 initial_embeddings_np = np.array(initial_embeddings) 
-num_tokens = initial_embeddings_np.shape[0]
-embedding_dim = initial_embeddings_np.shape[1]
+num_tokens = initial_embeddings_np.shape[0]  # Number of tokens (rows)
+embedding_dim = initial_embeddings_np.shape[1]  # Embedding dimension (columns)
 
-# Create simple positional vectors (e.g., based on index)
-position_vectors = np.zeros_like(initial_embeddings_np) # Initialize array of zeros
+# Initialize an array to hold the positional vectors (same shape as initial embeddings)
+position_vectors = np.zeros_like(initial_embeddings_np)  # Initialize array of zeros with the same shape
+
+# Loop over each token (or position)
 for i in range(num_tokens):
-    # Example: Make vector slightly different for each position 
-    # (real methods are more complex, e.g., sine/cosine)
-    position_vectors[i, :] = np.sin(i / (10**(np.arange(0, embedding_dim, 2)/embedding_dim)))[:position_vectors.shape[1]//2]
-    position_vectors[i, 1::2] = np.cos(i / (10**(np.arange(0, embedding_dim, 2)/embedding_dim)))[:position_vectors.shape[1]//2]
-    # Or just use small random numbers for demo: position_vectors[i, :] = np.random.randn(embedding_dim) * 0.1
+    # Generate sine and cosine positional encodings for each token's position (i)
+    for j in range(embedding_dim // 2):  # Using embedding_dim//2 for even and odd index separation
+        # Even indices (2*j): Apply sine function
+        position_vectors[i, 2*j] = np.sin(i / (10**(2*j / embedding_dim)))  
+        
+        # Odd indices (2*j+1): Apply cosine function
+        position_vectors[i, 2*j+1] = np.cos(i / (10**(2*j / embedding_dim)))  
 
-# Add positional vectors to token embeddings element-wise
+# Add the positional vectors to the token embeddings element-wise
 position_aware_embeddings_np = initial_embeddings_np + position_vectors
 
+# Print the shape before and after adding the positional vectors
 print(f"Shape before adding position: {initial_embeddings_np.shape}")
 print(f"Shape after adding position: {position_aware_embeddings_np.shape}")
-# print("First Position-Aware Embedding Vector:\n", position_aware_embeddings_np[0]) # Uncomment to view
+
+# Optionally print the first position-aware embedding to see the result
+print("First Position-Aware Embedding Vector:\n", position_aware_embeddings_np[0])
 ```
 
 *   **Explanation:** We created unique vectors based on position and simply added them to the meaning vectors. Now, each vector entering the main Transformer layers knows both the token's meaning *and* its position.
