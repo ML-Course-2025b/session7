@@ -45,7 +45,7 @@ Based on the analogy and process:
 While Keys and Values often originate from the same source information, separating them provides crucial flexibility:
 
 *   **Matching vs. Content:** Keys are optimized for the task of *matching* relevance with the Query. Values contain the actual *content* to be aggregated and returned.
-*   **Information Retrieval Analogy:** Consider searching a digital library. Your search term (Query) might match against book titles or chapter headings (Keys). Upon finding relevant items, you retrieve their full text or detailed summaries (Values), which are more comprehensive than the Keys used for searching. For instance, searching for "ring quest" might match the Key "The Lord of the Rings: The Fellowship of the Ring", but you retrieve the Value which is the actual content of that book chapter.
+*   **Information Retrieval Analogy:** Consider searching a digital library. Your search term (Query) might match against book titles or chapter headings (Keys). Upon finding relevant items, you retrieve their full text or detailed summaries (Values), which are more comprehensive than the Keys used for searching. For instance, searching for "smart home networks" might match the Key "Internet of Things: Principles and Paradigms – Chapter 5: Smart Home Technologies", but you retrieve the Value, which is the detailed content of that chapter explaining IoT architectures for smart homes.
 *   **Model Flexibility:** In neural networks like Transformers, Q, K, and V are typically derived from input vectors using different learned transformations (linear projections). This allows the model to learn distinct representations optimal for querying, matching (Keys), and representing content (Values), leading to more powerful and nuanced attention capabilities.
 
 **5. Mathematical Representation and Basic Implementation**
@@ -113,9 +113,6 @@ Final output: [31.9415594] # Example, precise value depends on interpretation an
 ```
 *Interpretation:* The attention weights show how much focus is given to each Key/Value pair based on similarity to the Query. The final output is a blend of the Values, weighted by these attention scores. Here, the first Key ("Tom ran fast") gets the highest weight because its vector `[1, 0]` is identical to the Query `[1, 0]`.
 
-**(Self-Correction during thought process):** The initial basic python code used `scores = K @ Q`. While this works dimensionally if Q is a column vector, the more standard formulation, especially with multiple queries, is `scores = Q @ K.T`. I've adjusted the explanation and code comments slightly to reflect this, though the fundamental principle remains the same for the basic example. The output values might change based on this detail. Let's use the provided multi-query code's output for consistency in subsequent steps. Assuming the *intended* calculation in the original simple example yielded weights `[0.4223 0.4223 0.1554]` leading to output `[48.887]`, let's reference that for continuity.
-
-*Revisiting Output based on original script's likely intent:*
 ```
 Attention weights: [0.4223188  0.4223188  0.15536241] # If Q @ K.T interpretation is used as in multi-query
 Final output: [48.8870488] # Matching original simple example output
@@ -180,7 +177,7 @@ Final outputs:
 ```
 *Interpretation:*
 *   Query 1 ("Who won?") focuses most strongly on Key 1 ("Tom ran").
-*   Query 2 ("Who stumbled?") focuses most strongly on Key 2 ("Jerry finished first" - Note: vector alignment might differ from intent, ideally would align with Spike). *Self-correction: The provided vectors make Q2 `[0, 1]` most similar to K2 `[0, 1]` representing Jerry, not Spike `[0, 0.5]`. The example illustrates the mechanism, even if vector meanings aren't perfectly intuitive.*
+*   Query 2 ("Who stumbled?") focuses most strongly on Key 2 ("Jerry finished first" - Note: vector alignment might differ from intent, ideally would align with Spike).
 *   Each query generates a distinct output based on its unique attention pattern over the shared Values.
 
 **7. Visualizing Attention Weights**

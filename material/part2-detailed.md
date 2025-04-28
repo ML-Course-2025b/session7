@@ -20,9 +20,6 @@ Transformers introduced two key innovations:
 
 Think of the Attention mechanism as being able to instantly consult an index or cross-references across an entire document (the input sequence) to understand the meaning of a specific word or phrase within its full context, all while processing the document's sections in parallel.
 
-> [!NOTE]  
-> More on [attention here](./Attention.md)
-
 ### 3. Preparing Text Data: Core Components
 
 Before the main Transformer layers can process information, the raw input text must be converted into a suitable numerical format. This involves several standard pre-processing steps:
@@ -209,6 +206,9 @@ print("Step 5: Attention Output for Token 1 (Contextualized Vector):", attn_outp
 # This is the updated representation for Token 1, incorporating context.
 ```
 
+> [!TIP]  
+> More on [attention here](./Attention.md)
+
 #### 3.5 Multi-Head Attention
 
 Transformers enhance the attention mechanism by using **Multi-Head Attention**. Instead of performing the attention calculation just once with one set of Q, K, V matrices, they perform it multiple times in parallel, each time using *different*, independently learned linear transformations to generate the Q, K, and V vectors. Each parallel instance is called an "attention head".
@@ -268,7 +268,7 @@ BERT's impressive ability to understand language comes from its **pre-training**
     *   **Relevance:** While intended to help with downstream tasks requiring sentence-pair understanding (like Question Answering), the actual benefit of NSP compared to MLM alone has been debated, and some subsequent models omit it.
 
 
-> [!NOTE]  
+> [!TIP]  
 > More on [BERT's Pre-training Tasks](./Pre-training-Tasks.md)
 
 
@@ -557,6 +557,10 @@ We have explored the three primary architectures based on the Transformer mechan
 *   **Decoder-Only (e.g., GPT):** Designed for generating text autoregressively using masked (causal) self-attention. Ideal for text generation, chatbots, and prompt-based tasks.
 *   **Encoder-Decoder (e.g., T5, Original Transformer):** Designed for mapping input sequences to output sequences. Uses bidirectional self-attention in the encoder, and both masked self-attention and cross-attention (attending to encoder output) in the decoder. Suited for translation, summarization, and other sequence-to-sequence tasks.
 
+<img src="./img/transformer.svg" width="50%">
+
+*(See: [ General Transformer architecture](https://huggingface.co/learn/llm-course/chapter1/4#general-transformer-architecture))*
+
 #### 7.2 Key Takeaways
 
 *   The **Attention mechanism** is the cornerstone of Transformers, enabling parallel processing and effective capture of contextual dependencies by allowing tokens to directly weigh the importance of other tokens.
@@ -582,3 +586,4 @@ Although these alternative architectures show promise and may become more promin
 *   **Implementation Guide:** "The Annotated Transformer" - Harvard NLP group's detailed PyTorch code walkthrough of the original paper: [http://nlp.seas.harvard.edu/annotated-transformer/](http://nlp.seas.harvard.edu/annotated-transformer/)
 *   **Practical Video Example:** Andrej Karpathy's "Let's build GPT": [Let's reproduce GPT-2](https://www.youtube.com/watch?v=l8pRSuU81PU) (Provides excellent insight into building a decoder-only model from scratch).
 *   **Model & Library Hub:** Hugging Face (https://huggingface.co/): A central resource for accessing pre-trained models, datasets, tutorials, and the widely used `transformers` library.
+*   **HuggingFace LLM Course:** https://huggingface.co/learn/llm-course

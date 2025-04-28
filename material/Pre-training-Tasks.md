@@ -138,7 +138,7 @@ processed_dataset = raw_dataset.map(encode_and_mask)
 # Set format for PyTorch
 processed_dataset.set_format(type='torch', columns=['input_ids', 'token_type_ids', 'attention_mask', 'labels', 'next_sentence_label'])
 ```
-*(Self-correction: The original code had a slight bug in mapping and didn't implement the 80/10/10 rule fully. Corrected the `encode` function to `encode_and_mask`, handle indices correctly for mapping, and implement the 80/10/10 rule more accurately, including ignoring special tokens for masking and setting non-masked MLM labels to -100).*
+
 
 **Step 5: Set Up Training Arguments**
 Define parameters for the training process.
@@ -199,7 +199,7 @@ print("NSP Logits (IsNext vs NotNext):", nsp_prediction_logits)
 predicted_token_id = torch.argmax(mlm_prediction_logits[0, 1, :]).item() # Index 1 corresponds to the first actual token
 print("Predicted token for first position:", tokenizer.decode([predicted_token_id]))
 ```
-*(Self-correction: The original code snippet for prediction was minimal. Added `with torch.no_grad()` for inference, clarified what logits represent, and showed how to potentially decode a predicted token.)*
+
 
 **Conclusion**
 

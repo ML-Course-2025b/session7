@@ -47,6 +47,8 @@ print(f"Token IDs: {token_ids}")
 *   **Explanation:** The code uses a standard BERT tokenizer to split the text into tokens (like `'cats'`, `'sleep'`, `'sound'`, `'##ly'`, `'.'`) and then converts them into unique ID numbers. This is the first step.
 </details>
 
+> [!TIP]  
+> You can use [this tool](https://platform.openai.com/tokenizer) to understand how a piece of text might be tokenized by a language model
 
 
 **Step 2: Embeddings - Giving Tokens Initial Meaning Vectors**
@@ -268,13 +270,17 @@ if model:
 
 These final embeddings are highly useful for tasks requiring text understanding:
 *   **Classification:** Add a simple classifier on top (often using the `[CLS]` token's output vector).
-*   **Feature Extraction:** Use these vectors as input for other ML models or for clustering (like in Activity 1).
+*   **Feature Extraction:** Use these vectors as input for other ML models or for clustering.
 
 ### Summary: The Big Picture
 
 BERT uses stacked **Encoder Blocks**, featuring **Self-Attention (Q/K/V)**, to read text bidirectionally and create deep contextual understanding. It learns this ability through **Pre-training** (like MLM). Its final output is rich **contextual embeddings**, great for analysis tasks.
 
 This Encoder model is one key type of Transformer. Others, like Decoders (GPT) or Encoder-Decoders (T5), build on these core ideas for different tasks like text generation or translation.
+
+<img src="./img/transformer.svg" width="50%">
+
+*(See: [ General Transformer architecture](https://huggingface.co/learn/llm-course/chapter1/4#general-transformer-architecture))*
 
 ---
 

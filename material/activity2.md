@@ -42,14 +42,14 @@ The dataset we will use in this example is [SST2](https://nlp.stanford.edu/senti
 Let's start by installing the Hugging Face `transformers` library so we can load our deep learning NLP model (DistilBERT). You would typically run the command inside the `pip install` code block in a Python environment like Google Colab.
 
 <details>
-<summary>Click to see Installation Command</summary>
+<summary>Click to see how to import the necessary libraries</summary>
 
 ```python
 # In a Colab or similar environment, run this:
 # !pip install transformers torch numpy pandas scikit-learn
 ```
 
-</details>
+
 
 Now, let's import the necessary libraries for our script.
 
@@ -65,6 +65,8 @@ import transformers as ppb # ppb is a common alias for pre-trained models from H
 import warnings
 warnings.filterwarnings('ignore')
 ```
+
+</details>
 
 ## Importing the dataset
 
@@ -89,6 +91,9 @@ print(df.head())
 
 For performance reasons and to make this activity run faster, we'll only use the first 2,000 sentences from the dataset.
 
+<details>
+<summary>Click to see how this is done</summary>
+
 ```python
 # Select the first 2000 rows
 batch_1 = df[:2000]
@@ -102,6 +107,8 @@ Let's check the distribution of positive (1) and negative (0) labels in our samp
 print("\nValue counts for labels in our sample (0=Negative, 1=Positive):")
 print(batch_1[1].value_counts())
 ```
+
+</details>
 
 ## Loading the Pre-trained BERT model (DistilBERT)
 
@@ -281,11 +288,16 @@ print(f"Shape of extracted features (sentence embeddings): {features.shape}")
 
 Let's get the corresponding labels (0 or 1 for negative/positive) ready.
 
+<details>
+<summary>Click to see how this is done</summary>
+
 ```python
 # Extract the labels from our initial batch dataframe (column index 1)
 labels = batch_1[1]
 print(f"Shape of labels: {labels.shape}") # Expected: (2000,)
 ```
+
+</details>
 
 ## Model #2: Logistic Regression Classifier
 
