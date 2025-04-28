@@ -89,7 +89,7 @@ print(f"Shape of Initial Embeddings: {initial_embeddings_np.shape}") # (Num toke
 *   **Explanation:** We created a conceptual lookup table (`embedding_table`). We took our list of Token IDs and looked up the corresponding vector (list of numbers) for each ID. These vectors hold the initial "meaning".
 </details>
 
-
+<img src="./img/embedding.png" width="50%">
 
 **Step 3: Positional Encoding - Adding Order Information**
 
