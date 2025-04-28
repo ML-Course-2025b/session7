@@ -587,3 +587,4 @@ Although these alternative architectures show promise and may become more promin
 *   **Practical Video Example:** Andrej Karpathy's "Let's build GPT": [Let's reproduce GPT-2](https://www.youtube.com/watch?v=l8pRSuU81PU) (Provides excellent insight into building a decoder-only model from scratch).
 *   **Model & Library Hub:** Hugging Face (https://huggingface.co/): A central resource for accessing pre-trained models, datasets, tutorials, and the widely used `transformers` library.
 *   **HuggingFace LLM Course:** https://huggingface.co/learn/llm-course
+*   **HuggingFace AI Agents Course:** https://huggingface.co/learn/agents-course/

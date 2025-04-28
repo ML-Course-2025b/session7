@@ -285,4 +285,4 @@ This Encoder model is one key type of Transformer. Others, like Decoders (GPT) o
 ---
 
 > [!NOTE]  
-> For more detail on specific components or other architectures,[ please refer to this reading](./part2-detailed.md).
+> For more details on specific components or other architectures,[ please refer to this reading](./part2-detailed.md).
