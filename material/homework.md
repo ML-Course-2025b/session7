@@ -32,5 +32,5 @@ Please **create a separate directory** in your group’s **Google Drive folder**
 > [!NOTE]  
 > - Focus on **clarity** and **highlight the main points** during the presentation.
 > - The short report should be concise but reflective.
-> - [How to share Your Colab Notebook](./material/colab.md)
+> - [How to share Your Colab Notebook](./colab.md)
 
