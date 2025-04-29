@@ -1,3 +1,146 @@
+# Understanding the Attention Mechanism
+
+**Introduction**
+
+In natural language processing, understanding the meaning of a word often depends on the context provided by surrounding words. Traditional word embeddings assign a fixed vector to each word, which doesn't capture how meaning can shift based on context. The **attention mechanism** addresses this by allowing a model to dynamically weigh the importance of different words when processing a particular word, creating context-aware representations.
+
+**1. Representing Words: Embeddings**
+
+We start with word embeddings, which are vector representations of words. Each dimension in the vector can be thought of as capturing some abstract feature or concept.
+
+*   **Example:** Consider embeddings for "cat", "dog", "lion", and "NYC". We can represent them as 3-dimensional vectors, where dimensions might loosely correspond to concepts like *petness*, *animalness*, and *cityness*.
+    *   `cat`: `[-2.5, 1.0, 0.0]` (High petness, medium animalness, low cityness)
+    *   `dog`: `[-2.7, 0.5, -0.2]` (High petness, medium animalness, low cityness)
+    *   `lion`: `[0.0, 5.0, -1.0]` (Low petness, high animalness, low cityness)
+    *   `NYC`: `[-2.0, 1.0, 5.0]` (Low petness, low animalness, high cityness)
+
+These embeddings serve as the initial input.
+
+**2. The Core Idea: Weighted Sum for Context**
+
+Attention allows a model, when processing one word (e.g., "dog"), to focus on other words in the sequence (e.g., "cat", "dog", "lion") based on their relevance to the current word.
+
+*   **Attention Weights:** For the word "dog", the mechanism calculates *attention weights* indicating how much importance or "attention" it should pay to "cat", itself ("dog"), and "lion". These weights are positive and sum to 1.
+    *   *Simplified Example:* Let's assume the calculated weights for "dog" attending to ["cat", "dog", "lion"] are `[0.4, 0.5, 0.1]`. This means "dog" focuses most on itself (0.5), somewhat on "cat" (0.4), and less on "lion" (0.1).
+*   **Attention Output:** The final representation for "dog" (its *attention output*) is computed as a **weighted sum** of the embeddings of all words being attended to, using these attention weights.
+    *   `Output_dog = (0.4 * embedding_cat) + (0.5 * embedding_dog) + (0.1 * embedding_lion)`
+    *   This output vector is a blend of information from the relevant words, creating a *contextualized* representation for "dog". It's no longer just the original `embedding_dog`, but a version informed by its neighbors according to the attention weights.
+
+*Visualization Concept:* If plotted in 3D space, the original embeddings ("cat", "dog", "lion") would be points. The attention output for "dog" would be a new point located somewhere between the original points, pulled closer to those with higher attention weights (in this case, closer to "dog" and "cat").*
+
+**3. How Attention Weights are Calculated: Query, Key, Value**
+
+The simplified example above used pre-defined weights. In practice, these weights are calculated dynamically using three components derived from the input embeddings:
+
+| Component | Role                                                                  | Analogy                |
+| :-------- | :-------------------------------------------------------------------- | :--------------------- |
+| **Query (Q)** | Represents the current word that is seeking information.           | You asking a question. |
+| **Key (K)**   | Represents each word in the context (including itself) being queried. | Keywords describing topics someone knows about. |
+| **Value (V)** | Represents the actual content or information of each word.           | The answer/information someone provides if their topic matches your question. |
+
+**The Calculation Steps:**
+
+1.  **Derive Q, K, V:** The input embeddings are transformed into Query, Key, and Value vectors using separate learned linear transformations (multiplying by weight matrices W_Q, W_K, W_V). These matrices are learned during model training.
+    *   `Queries = Input_Embeddings × W_Q`
+    *   `Keys = Input_Embeddings × W_K`
+    *   `Values = Input_Embeddings × W_V`
+    *   *Self-Attention:* In many architectures (like Transformers), Q, K, and V are derived from the *same* set of input embeddings, allowing words within a sequence to attend to each other.
+
+2.  **Calculate Attention Scores:** To determine relevance, the Query vector of the current word is compared against the Key vectors of all words in the context. A common method is the **dot product**:
+    *   `Score_i = dot_product(Query_current_word, Key_i)`
+    *   A higher score indicates greater relevance between the Query and the Key of word `i`.
+
+3.  **Normalize Scores with Softmax:** The raw scores are converted into attention weights that are positive and sum to 1. This is typically done using the **softmax function**:
+    *   `Attention_Weights = softmax(Scores)`
+    *   This ensures the weights represent a probability distribution over the words being attended to.
+
+4.  **Compute Weighted Sum of Values:** The final attention output is calculated by multiplying each Value vector by its corresponding attention weight and summing the results:
+    *   `Attention_Output = Σ (Attention_Weight_i * Value_i)`
+
+This `Attention_Output` is the new, contextualized vector representation for the current word.
+
+**4. Illustrative Code Example (Full Mechanism)**
+
+The following Python code demonstrates these steps using the example embeddings:
+
+```python
+import numpy as np
+
+# --- Setup ---
+np.random.seed(42) # For reproducibility
+
+# 1. Define initial 3D embeddings
+cat = np.array([-2.5, 1.0, 0.0])
+dog = np.array([-2.7, 0.5, -0.2])
+lion = np.array([0.0, 5.0, -1.0])
+# (Using the embeddings from the first part for consistency)
+
+# Collect into an input matrix (Tokens x Dimensions)
+embeddings = np.stack([cat, dog, lion])  # shape (3, 3)
+print(f"Input Embeddings:\n{embeddings}\n")
+
+# --- Attention Calculation ---
+
+# 2. Simulate learned weight matrices (W_Q, W_K, W_V)
+# In a real model, these are learned. Here, we use identity matrices for simplicity,
+# meaning Q, K, V will initially be the same as the embeddings.
+embedding_dim = embeddings.shape[1]
+W_Q = np.eye(embedding_dim)  # (3x3)
+W_K = np.eye(embedding_dim)  # (3x3)
+W_V = np.eye(embedding_dim)  # (3x3)
+
+# 3. Compute Queries, Keys, and Values
+# Matrix multiplication: (Num_Tokens, Emb_Dim) @ (Emb_Dim, Emb_Dim) -> (Num_Tokens, Emb_Dim)
+Queries = embeddings @ W_Q    # shape (3, 3)
+Keys = embeddings @ W_K      # shape (3, 3)
+Values = embeddings @ W_V    # shape (3, 3)
+
+# print(f"Queries:\n{Queries}\n")
+# print(f"Keys:\n{Keys}\n")
+# print(f"Values:\n{Values}\n")
+
+# 4. Calculate attention for a specific word, e.g., "dog" (index 1)
+# Select the Query vector for "dog"
+query_dog = Queries[1]  # shape (3,)
+# print(f"Query for 'dog':\n{query_dog}\n")
+
+# 5. Compute raw attention scores: dot product of query_dog with all Keys
+# Transpose Keys for correct matrix multiplication: (Emb_Dim,) @ (Emb_Dim, Num_Tokens) -> (Num_Tokens,)
+# Or element-wise: Keys @ query_dog: (Num_Tokens, Emb_Dim) @ (Emb_Dim,) -> (Num_Tokens,)
+attention_scores = Keys @ query_dog  # shape (3,)
+# attention_scores[i] = dot_product(query_dog, Keys[i])
+print(f"Attention Scores for 'dog' (before softmax):\n{attention_scores}\n")
+
+# 6. Normalize scores into weights using Softmax
+def softmax(x):
+    exp_x = np.exp(x - np.max(x))  # Subtract max for numerical stability
+    return exp_x / np.sum(exp_x)
+
+attention_weights_for_dog = softmax(attention_scores)  # shape (3,)
+print(f"Attention Weights for 'dog' (after softmax):\n{attention_weights_for_dog}\n")
+# Note: These weights differ from the simplified example because they are calculated
+# based on embedding similarity (via dot product) rather than being assigned arbitrarily.
+
+# 7. Calculate the final attention output for "dog"
+# Weighted sum of Value vectors: Sum(weight_i * Value_i)
+# Reshape weights for broadcasting: (Num_Tokens, 1) * (Num_Tokens, Emb_Dim) -> Sum axis 0
+attention_output_for_dog = np.sum(attention_weights_for_dog[:, np.newaxis] * Values, axis=0) # shape (3,)
+print(f"Attention Output for 'dog' (Contextualized Embedding):\n{attention_output_for_dog}\n")
+```
+
+**5. Significance of Attention**
+
+*   **Contextualization:** Attention allows models to create word representations that are sensitive to the surrounding context. The meaning of a word is no longer fixed but adapts based on what other words it attends to.
+*   **Flexibility:** Instead of relying on fixed-size windows or sequential processing (like RNNs), attention can capture long-range dependencies by directly comparing any two words in a sequence, regardless of their distance.
+*   **Learned Focus:** The model learns *what* to pay attention to during training (by adjusting W_Q, W_K, W_V matrices), allowing it to identify relevant relationships in the data automatically.
+
+This mechanism is a fundamental component of modern NLP models, particularly the Transformer architecture, enabling significant advances in tasks like machine translation, text summarization, and question answering.
+
+
+*(See: [Understanding Attention Mechanism](https://learnopencv.com/attention-mechanism-in-transformer-neural-networks/))*
+
+
+<!-- 
 **Understanding Attention: Query (Q), Key (K), and Value (V)**
 
 The attention mechanism is a fundamental concept in modern artificial intelligence, enabling models to focus selectively on relevant parts of input data when performing a task. Three core components facilitate this process: Query (Q), Key (K), and Value (V).
@@ -276,4 +419,5 @@ Final Output (context vector): [72.845703   17.17415515]
 
 **Summary**
 
-The Query-Key-Value framework allows attention mechanisms to dynamically determine the relevance of different pieces of information (Keys) based on a specific context (Query) and then construct an output by selectively combining the corresponding information content (Values). The separation of Keys and Values adds flexibility, enabling sophisticated information retrieval and synthesis within AI models. The provided code examples illustrate these steps numerically and visually.
+The Query-Key-Value framework allows attention mechanisms to dynamically determine the relevance of different pieces of information (Keys) based on a specific context (Query) and then construct an output by selectively combining the corresponding information content (Values). The separation of Keys and Values adds flexibility, enabling sophisticated information retrieval and synthesis within AI models. The provided code examples illustrate these steps numerically and visually. 
+-->

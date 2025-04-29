@@ -63,27 +63,62 @@ The Token IDs need meaning. An **Embedding** layer acts like a dictionary, mappi
 
 ```python
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-# Example: Imagine a vocab of 100 tokens, each gets a vector of size 8
-vocab_size = 100 
-embedding_dim = 8 
-# In reality, this table is learned; here we use random numbers for illustration
-embedding_table = np.random.rand(vocab_size, embedding_dim) 
+# Define 3D semantic embeddings (manually set for illustration)
+# Format: [petness, animalness, cityness]
+embedding_dict = {
+    "cat":  [2, 3, 0],
+    "dog":  [2.5, 2.8, 0.1],   # Close to cat
+    "lion": [0, 5, 0],
+    "NYC":  [0, 0, 5],         # High on cityness, unrelated to animals
+}
 
-# Our token IDs from Step 1 (let's use some example IDs within 0-99)
-sample_ids = [10, 25, 3, 99] # Example IDs as a standard Python list
+# Simulate an embedding table and token IDs
+# Create dummy table for 100 tokens with 3D vectors
+vocab_size = 100
+embedding_dim = 3
+embedding_table = np.random.rand(vocab_size, embedding_dim)
 
-# Look up the vectors for each ID
-# We use list comprehension to get the corresponding row for each ID
+# Add custom tokens into this table
+custom_tokens = ["cat", "dog", "lion", "NYC"]
+custom_ids = [10, 25, 3, 99]  # Simulated token IDs
+for token, idx in zip(custom_tokens, custom_ids):
+    embedding_table[idx] = embedding_dict[token]
+
+# Retrieve embeddings using token IDs
+sample_ids = custom_ids
 initial_embeddings = [embedding_table[id_] for id_ in sample_ids]
 
+# Print information similar to original code
 print(f"Sample Token IDs: {sample_ids}")
-# Convert to numpy array just to show the shape easily
 initial_embeddings_np = np.array(initial_embeddings)
-print(f"Shape of Initial Embeddings: {initial_embeddings_np.shape}") # (Num tokens, Embedding dimension)
+print(f"Shape of Initial Embeddings: {initial_embeddings_np.shape}")
+print("First embedding vector:\n", initial_embeddings[0])
 
-# To view the first embedding vector (list of numbers):
-# print("First embedding vector:\n", initial_embeddings[0]) 
+# Plot the 3D embeddings
+fig = plt.figure(figsize=(8, 6))
+ax = fig.add_subplot(111, projection='3d')
+
+xs = initial_embeddings_np[:, 0]  # petness
+ys = initial_embeddings_np[:, 1]  # animalness
+zs = initial_embeddings_np[:, 2]  # cityness
+
+ax.scatter(xs, ys, zs, color='green', s=60)
+
+# Annotate each point
+for i, label in enumerate(custom_tokens):
+    ax.text(xs[i], ys[i], zs[i], label, fontsize=10)
+
+# Set axis labels
+ax.set_xlabel("Petness")
+ax.set_ylabel("Animalness")
+ax.set_zlabel("Cityness")
+ax.set_title("3D Semantic Embedding Visualization")
+
+plt.tight_layout()
+plt.show()
 ```
 
 *   **Explanation:** We created a conceptual lookup table (`embedding_table`). We took our list of Token IDs and looked up the corresponding vector (list of numbers) for each ID. These vectors hold the initial "meaning".
@@ -104,41 +139,85 @@ Transformers look at words simultaneously, losing the original order. **Position
 
 ```python
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
-# Example embeddings: You can replace this with your actual initial embeddings
-# For the demo, we're assuming there are 5 tokens, each with a 4-dimensional embedding
-initial_embeddings = np.random.randn(5, 4)  # 5 tokens, each with a 4-dimensional embedding
+# Define semantic embeddings (manually)
+embedding_dict = {
+    "cat":  [2, 3, 0],
+    "dog":  [2.5, 2.8, 0.1],
+    "lion": [0, 5, 0],
+    "NYC":  [0, 0, 5],
+}
+custom_tokens = ["cat", "dog", "lion", "NYC"]
+custom_ids = [10, 25, 3, 99]
 
-# Convert the initial embeddings to a numpy array for easy manipulation
-initial_embeddings_np = np.array(initial_embeddings) 
-num_tokens = initial_embeddings_np.shape[0]  # Number of tokens (rows)
-embedding_dim = initial_embeddings_np.shape[1]  # Embedding dimension (columns)
+# Create a random embedding table and override the target embeddings
+vocab_size = 100
+embedding_dim = 3
+embedding_table = np.random.rand(vocab_size, embedding_dim)
+for token, idx in zip(custom_tokens, custom_ids):
+    embedding_table[idx] = embedding_dict[token]
 
-# Initialize an array to hold the positional vectors (same shape as initial embeddings)
-position_vectors = np.zeros_like(initial_embeddings_np)  # Initialize array of zeros with the same shape
+# Look up embeddings
+sample_ids = custom_ids
+initial_embeddings = np.array([embedding_table[id_] for id_ in sample_ids])
+print(f"Shape of Initial Embeddings: {initial_embeddings.shape}")
+print("First embedding vector:\n", initial_embeddings[0])
 
-# Loop over each token (or position)
+# Positional encoding (simplified sinusoidal method for 3D)
+num_tokens = initial_embeddings.shape[0]
+position_vectors = np.zeros_like(initial_embeddings)
 for i in range(num_tokens):
-    # Generate sine and cosine positional encodings for each token's position (i)
-    for j in range(embedding_dim // 2):  # Using embedding_dim//2 for even and odd index separation
-        # Even indices (2*j): Apply sine function
-        position_vectors[i, 2*j] = np.sin(i / (10**(2*j / embedding_dim)))  
-        
-        # Odd indices (2*j+1): Apply cosine function
-        position_vectors[i, 2*j+1] = np.cos(i / (10**(2*j / embedding_dim)))  
+    for j in range(embedding_dim):
+        if j % 2 == 0:
+            position_vectors[i, j] = np.sin(i / (10000 ** (j / embedding_dim)))
+        else:
+            position_vectors[i, j] = np.cos(i / (10000 ** (j / embedding_dim)))
 
-# Add the positional vectors to the token embeddings element-wise
-position_aware_embeddings_np = initial_embeddings_np + position_vectors
+# Combine original embeddings with position info
+position_aware_embeddings = initial_embeddings + position_vectors
 
-# Print the shape before and after adding the positional vectors
-print(f"Shape before adding position: {initial_embeddings_np.shape}")
-print(f"Shape after adding position: {position_aware_embeddings_np.shape}")
+print(f"Shape after adding position: {position_aware_embeddings.shape}")
+print("First Position-Aware Embedding Vector:\n", position_aware_embeddings[0])
 
-# Optionally print the first position-aware embedding to see the result
-print("First Position-Aware Embedding Vector:\n", position_aware_embeddings_np[0])
+# 3D Plot
+fig = plt.figure(figsize=(10, 6))
+ax = fig.add_subplot(111, projection='3d')
+
+# Original positions (for reference)
+ax.scatter(initial_embeddings[:, 0], initial_embeddings[:, 1], initial_embeddings[:, 2],
+           color='blue', label='Original', s=50)
+
+# Position-aware versions
+ax.scatter(position_aware_embeddings[:, 0], position_aware_embeddings[:, 1],
+           position_aware_embeddings[:, 2], color='red', label='With Position', s=50)
+
+# Draw arrows to show shift due to position
+for i in range(num_tokens):
+    ax.plot([initial_embeddings[i, 0], position_aware_embeddings[i, 0]],
+            [initial_embeddings[i, 1], position_aware_embeddings[i, 1]],
+            [initial_embeddings[i, 2], position_aware_embeddings[i, 2]],
+            color='gray', linestyle='--')
+
+# Annotate
+for i, token in enumerate(custom_tokens):
+    ax.text(position_aware_embeddings[i, 0], position_aware_embeddings[i, 1],
+            position_aware_embeddings[i, 2], f"{token}", fontsize=9)
+
+ax.set_xlabel("Petness")
+ax.set_ylabel("Animalness")
+ax.set_zlabel("Cityness")
+ax.set_title("3D Semantic Embeddings with Positional Encoding")
+ax.legend()
+plt.tight_layout()
+plt.show()
 ```
 
 *   **Explanation:** We created unique vectors based on position and simply added them to the meaning vectors. Now, each vector entering the main Transformer layers knows both the token's meaning *and* its position.
+
+*(See: [Positional Encoding](./position.md))*
+
 </details>
 
 
@@ -156,40 +235,21 @@ These position-aware vectors now go through a stack of **Encoder Blocks** (e.g.,
     *   The final output for each word is a blend (weighted average) of all words' Values, based on those attention weights.
 *   **Bidirectional:** Because words look both forwards and backwards, BERT gets a deep, bidirectional understanding.
 
+<img src="./img/qvn.png" width="50%">
+
 <details>
 <summary>Click to see Demo: The *Effect* of Attention (Simplified)</summary>
 
 ```python
-import numpy as np
 
-# Imagine we have 3 position-aware vectors (Values) for 3 words.
-# Each row is a word's vector.
-Values = np.array([
-    [1.0, 0.0], # Vector representing Word 1's content
-    [0.0, 1.0], # Vector representing Word 2's content
-    [0.5, 0.5]  # Vector representing Word 3's content
-])
-
-# Now, imagine Word 2 ("sleep" in "Cats sleep soundly") calculated attention weights.
-# It decided how much attention to pay to Word 1, Word 2, and Word 3.
-# These weights MUST sum to 1.0
-attention_weights_for_word2 = np.array([0.3, 0.6, 0.1]) # Example weights
-
-# Calculate the attention output *for Word 2* by blending the Values
-# Output = weight1*Value1 + weight2*Value2 + weight3*Value3
-# Using numpy broadcasting: weights[:, np.newaxis] * Values -> sum along axis 0
-attention_output_for_word2 = np.sum(attention_weights_for_word2[:, np.newaxis] * Values, axis=0)
-
-print(f"Example Values (Word 1, Word 2, Word 3):\n{Values}")
-print(f"\nExample Attention Weights calculated *by Word 2*:\n{attention_weights_for_word2}")
-print(f"\nAttention Output *for Word 2* (Blended Context):\n{attention_output_for_word2}") 
-# Example Output: [0.35 0.65] 
 ```
 
 *   **Explanation:** This demo skips the complex Q/K matching. It shows the *result* of attention: how pre-calculated relevance weights (here, `[0.3, 0.6, 0.1]` for Word 2) are used to create a new, context-blended vector (`[0.35, 0.65]`) for Word 2 by taking a weighted average of all the word's Value vectors. The model does this for *every* word. After attention, a standard **Feed-Forward Network** processes each resulting vector individually.
 </details>
 
+<img src="./img/qvn2.png" width="50%">
 
+*(See: [Attention Mechanism](./Attention.md))*
 
 **Step 5: Stacking Blocks**
 

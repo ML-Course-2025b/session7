@@ -2,6 +2,7 @@
 
 > [!IMPORTANT]  
 > - [Homework for this week](./material/homework.md)
+> - Course **Feedback** *5.5.2025 - 09.05.2025*
 > - Grades for week 6, by the evening
 ---
 
@@ -49,10 +50,15 @@
 
 - https://excalidraw.com/
 - Slides
+- [AutoML](https://www.automl.org/automl/)
+- [Building a TinyML Application with TF Micro and SensiML](https://blog.tensorflow.org/2021/05/building-tinyml-application-with-tf-micro-and-sensiml.html)
+- [Advantages of Moving Deep Learning to the Edge](https://viso.ai/edge-ai/edge-intelligence-deep-learning-with-edge-computing/#elementor-toc__heading-anchor-9)
+- [Scope of Cloud and Edge Computing](https://viso.ai/edge-ai/edge-intelligence-deep-learning-with-edge-computing/#elementor-toc__heading-anchor-17)
 - https://www.edgeaifoundation.org/
 - https://edgeimpulse.com/
 - https://sensiml.com/
 - https://ai.google.dev/edge/litert
+- [FNet: Mixing Tokens with Fourier Transforms](https://github.com/google-research/google-research/blob/master/f_net/README.md)
 
 </details>
 
