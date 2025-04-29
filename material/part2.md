@@ -241,7 +241,59 @@ These position-aware vectors now go through a stack of **Encoder Blocks** (e.g.,
 <summary>Click to see Demo: The *Effect* of Attention (Simplified)</summary>
 
 ```python
+import numpy as np
 
+# Setup
+np.random.seed(42)  # For reproducibility
+
+# 1. Define 3D embeddings manually for simple illustration
+cat = np.array([-3, 1, 0]) 
+dog = np.array([3, -1, -1])
+lion = np.array([0, 5, -1])
+nyc = np.array([-2, 1, 5])
+
+# Collect into a matrix
+embeddings = np.stack([cat, dog, lion])  # shape (3,3)
+
+# 2. Create small "weight matrices" for Query, Key, and Value
+embedding_dim = embeddings.shape[1]
+# In real networks these are learned; here we can use identity or slight perturbations
+W_Q = np.eye(embedding_dim)  # (3x3)
+W_K = np.eye(embedding_dim)  # (3x3)
+W_V = np.eye(embedding_dim)  # (3x3)
+
+# 3. Compute Queries, Keys, and Values
+Queries = embeddings @ W_Q    # (3,3) × (3,3) → (3,3)
+Keys = embeddings @ W_K
+Values = embeddings @ W_V
+
+# 4. Pick the Query for "dog" (index 1)
+query_dog = Queries[1]  # vector shape (3,)
+
+# 5. Compute raw attention scores = dot product between query and each key
+attention_scores = Keys @ query_dog  # (3,3) × (3,) → (3,)
+# Now attention_scores[i] is the score between dog and i-th word.
+
+# 6. Softmax to normalize scores into attention weights
+def softmax(x):
+    exp_x = np.exp(x - np.max(x))  # subtract max for stability
+    return exp_x / np.sum(exp_x)
+
+attention_weights_for_dog = softmax(attention_scores)  # shape (3,)
+
+# 7. Calculate the final output = weighted sum of Values
+attention_output_for_dog = np.sum(attention_weights_for_dog[:, np.newaxis] * Values, axis=0)
+
+# 8. Print results
+print(f"Embeddings:\n{embeddings}\n")
+print(f"Queries:\n{Queries}\n")
+print(f"Keys:\n{Keys}\n")
+print(f"Values:\n{Values}\n")
+
+print(f"Query for 'dog':\n{query_dog}\n")
+print(f"Attention Scores (before softmax):\n{attention_scores}\n")
+print(f"Attention Weights (after softmax):\n{attention_weights_for_dog}\n")
+print(f"Attention Output for 'dog':\n{attention_output_for_dog}\n")
 ```
 
 *   **Explanation:** This demo skips the complex Q/K matching. It shows the *result* of attention: how pre-calculated relevance weights (here, `[0.3, 0.6, 0.1]` for Word 2) are used to create a new, context-blended vector (`[0.35, 0.65]`) for Word 2 by taking a weighted average of all the word's Value vectors. The model does this for *every* word. After attention, a standard **Feed-Forward Network** processes each resulting vector individually.
